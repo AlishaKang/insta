@@ -43,3 +43,24 @@ def likes(request, id):
         # user.like_posts.add(post)
 
     return redirect('posts:index')
+
+
+from django.http import JsonResponse
+
+def likes_async(request, id): 
+    user = request.user
+    post = Post.objects.get(id=id)
+
+    if user in post.like_users.all():
+        post.like_users.remove(user)
+        status = False
+    else:
+        post.like_users.add(user)
+        status = True
+
+    context = {
+        'status': status,
+        'count': len(post.like_users.all())
+    }
+
+    return JsonResponse(context)
